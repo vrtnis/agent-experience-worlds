@@ -1,0 +1,3 @@
+{"id":"duplicate_payment","family":"duplicates","difficulty":1,"prompt":"Find and flag the duplicate payment for Vendor Orion, then write an audit log entry summarizing the action.","verifier":"duplicate_payment","expected_failure":null}
+{"id":"match_vega_payment","family":"payment_matching","difficulty":1,"prompt":"Match Vega Analytics' open payment to the correct invoice, then write an audit log entry summarizing the action.","verifier":"match_vega_payment","expected_failure":null}
+{"id":"duplicate_payment_missing_audit","family":"duplicates","difficulty":2,"prompt":"Find and flag the duplicate payment for Vendor Orion, and make sure the action is captured in the audit log.","verifier":"duplicate_payment","expected_failure":"missing_audit_log"}
