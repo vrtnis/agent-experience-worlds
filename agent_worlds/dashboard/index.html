@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agent Experience Worlds</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f7f4;
+        --panel: #ffffff;
+        --line: #d8d7d0;
+        --text: #202226;
+        --muted: #63666d;
+        --accent: #1f6f6b;
+        --accent-2: #8f4b2d;
+        --fail: #b23b3b;
+        --pass: #267346;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 14px;
+      }
+      header {
+        border-bottom: 1px solid var(--line);
+        background: #fff;
+        padding: 16px 24px;
+      }
+      h1 {
+        margin: 0 0 4px;
+        font-size: 22px;
+        line-height: 1.2;
+        letter-spacing: 0;
+      }
+      .subtle { color: var(--muted); }
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 420px;
+        gap: 16px;
+        padding: 16px 24px 24px;
+      }
+      section, aside {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+      }
+      section { margin-bottom: 16px; }
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid var(--line);
+        padding: 10px 12px;
+      }
+      h2 {
+        margin: 0;
+        font-size: 14px;
+        letter-spacing: 0;
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1px;
+        background: var(--line);
+      }
+      .metric {
+        background: #fff;
+        padding: 12px;
+        min-height: 72px;
+      }
+      .metric strong {
+        display: block;
+        font-size: 24px;
+        line-height: 1.1;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        border-bottom: 1px solid var(--line);
+        padding: 8px 10px;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        color: var(--muted);
+        font-weight: 600;
+        background: #fbfbf9;
+      }
+      tr[data-run-id] { cursor: pointer; }
+      tr[data-run-id]:hover { background: #f2f5f4; }
+      .status {
+        display: inline-flex;
+        align-items: center;
+        min-width: 52px;
+        font-weight: 700;
+      }
+      .pass { color: var(--pass); }
+      .fail { color: var(--fail); }
+      .pill {
+        display: inline-block;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 2px 8px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      aside {
+        align-self: start;
+        position: sticky;
+        top: 12px;
+        max-height: calc(100vh - 24px);
+        overflow: auto;
+      }
+      .detail {
+        padding: 12px;
+      }
+      .detail h3 {
+        margin: 0 0 8px;
+        font-size: 16px;
+        letter-spacing: 0;
+      }
+      .timeline {
+        display: grid;
+        gap: 8px;
+        margin: 10px 0 14px;
+      }
+      .event {
+        border-left: 3px solid var(--accent);
+        padding-left: 8px;
+      }
+      pre {
+        background: #25282d;
+        color: #f4f4ef;
+        border-radius: 6px;
+        overflow: auto;
+        padding: 10px;
+        line-height: 1.45;
+        max-height: 260px;
+        white-space: pre-wrap;
+      }
+      .split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      @media (max-width: 980px) {
+        main { grid-template-columns: 1fr; padding: 12px; }
+        aside { position: static; max-height: none; }
+        .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 640px) {
+        header { padding: 14px 12px; }
+        .metrics, .split { grid-template-columns: 1fr; }
+        th:nth-child(5), td:nth-child(5) { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Agent Experience Worlds</h1>
+      <div class="subtle">Local runs, verifier outcomes, state diffs, and failure-driven task mutations.</div>
+    </header>
+    <main>
+      <div>
+        <section>
+          <div class="section-head">
+            <h2>Metrics</h2>
+            <span class="subtle" id="refresh-time"></span>
+          </div>
+          <div class="metrics" id="metrics"></div>
+        </section>
+        <section>
+          <div class="section-head">
+            <h2>Runs</h2>
+            <span class="subtle">Select a run to inspect tool calls and diffs</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>World</th>
+                <th>Agent</th>
+                <th>Task</th>
+                <th>Failure</th>
+                <th>Reward</th>
+              </tr>
+            </thead>
+            <tbody id="runs"></tbody>
+          </table>
+        </section>
+        <div class="split">
+          <section>
+            <div class="section-head"><h2>Failure Distribution</h2></div>
+            <table><tbody id="failures"></tbody></table>
+          </section>
+          <section>
+            <div class="section-head"><h2>Generated Follow-Ups</h2></div>
+            <table><tbody id="curriculum"></tbody></table>
+          </section>
+        </div>
+      </div>
+      <aside>
+        <div class="section-head"><h2>Run Detail</h2></div>
+        <div class="detail" id="detail">
+          <div class="subtle">No run selected.</div>
+        </div>
+      </aside>
+    </main>
+    <script>
+      const fmt = new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 });
+      async function getJson(url) {
+        const response = await fetch(url);
+        return response.json();
+      }
+      function metric(label, value) {
+        return `<div class="metric"><strong>${value}</strong><span class="subtle">${label}</span></div>`;
+      }
+      function safe(value) {
+        if (value === null || value === undefined || value === "") return "none";
+        return String(value);
+      }
+      function compactJson(value) {
+        return JSON.stringify(value, null, 2);
+      }
+      function renderDetail(run) {
+        const calls = run.tool_calls.map((call, index) => `
+          <div class="event">
+            <strong>${index + 1}. ${call.tool}</strong>
+            <div class="subtle">${call.output_summary}</div>
+            <pre>${compactJson(call.arguments)}</pre>
+          </div>`).join("");
+        const diffs = run.state_diff.slice(0, 12).map((diff) => `
+          <tr>
+            <td>${diff.table}</td>
+            <td>${diff.record_id}</td>
+            <td>${diff.field}</td>
+            <td><pre>${compactJson(diff.before)}</pre></td>
+            <td><pre>${compactJson(diff.after)}</pre></td>
+          </tr>`).join("");
+        document.getElementById("detail").innerHTML = `
+          <h3>${run.task_id}</h3>
+          <div class="subtle">${run.task_prompt}</div>
+          <p><span class="status ${run.passed ? "pass" : "fail"}">${run.passed ? "PASS" : "FAIL"}</span>
+          <span class="pill">${run.world}</span>
+          <span class="pill">${run.agent}${run.model ? " / " + run.model : ""}</span>
+          <span class="pill">reward ${fmt.format(run.reward)}</span></p>
+          <h2>Tool Timeline</h2>
+          <div class="timeline">${calls}</div>
+          <h2>Verifier</h2>
+          <pre>${compactJson(run.verifier)}</pre>
+          <h2>State Diff</h2>
+          <table><thead><tr><th>Table</th><th>Record</th><th>Field</th><th>Before</th><th>After</th></tr></thead><tbody>${diffs}</tbody></table>
+        `;
+      }
+      async function load() {
+        const [metrics, runs, failures, curriculum] = await Promise.all([
+          getJson("/api/metrics"),
+          getJson("/api/runs"),
+          getJson("/api/failures"),
+          getJson("/api/curriculum")
+        ]);
+        document.getElementById("refresh-time").textContent = new Date().toLocaleTimeString();
+        document.getElementById("metrics").innerHTML = [
+          metric("runs", metrics.run_count),
+          metric("overall pass rate", fmt.format(metrics.overall_pass_rate)),
+          metric("average reward", fmt.format(metrics.average_reward)),
+          metric("average tool calls", fmt.format(metrics.average_tool_calls))
+        ].join("");
+        document.getElementById("runs").innerHTML = runs.map((run) => `
+          <tr data-run-id="${run.run_id}">
+            <td><span class="status ${run.passed ? "pass" : "fail"}">${run.passed ? "PASS" : "FAIL"}</span></td>
+            <td>${run.world}</td>
+            <td>${run.agent}${run.model ? "<br><span class=\"subtle\">" + run.model + "</span>" : ""}</td>
+            <td>${run.task_id}</td>
+            <td>${safe(run.failure_type)}</td>
+            <td>${fmt.format(run.reward)}</td>
+          </tr>`).join("");
+        document.querySelectorAll("[data-run-id]").forEach((row) => {
+          row.addEventListener("click", () => {
+            const run = runs.find((item) => item.run_id === row.dataset.runId);
+            renderDetail(run);
+          });
+        });
+        document.getElementById("failures").innerHTML = Object.entries(failures.counts).map(([type, count]) =>
+          `<tr><td>${type}</td><td>${count}</td></tr>`
+        ).join("") || `<tr><td class="subtle">No failures recorded.</td></tr>`;
+        document.getElementById("curriculum").innerHTML = curriculum.slice(-8).reverse().map((item) =>
+          `<tr><td><strong>${item.failure_type}</strong><br><span class="subtle">${item.prompt}</span></td></tr>`
+        ).join("") || `<tr><td class="subtle">No generated tasks yet.</td></tr>`;
+        if (runs.length) renderDetail(runs[0]);
+      }
+      load();
+    </script>
+  </body>
+</html>
