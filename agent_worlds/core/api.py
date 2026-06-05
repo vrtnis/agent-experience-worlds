@@ -35,13 +35,13 @@ def create_app():
 
     @app.get("/api/runs")
     def runs() -> list[dict[str, Any]]:
-        return list(reversed(_runs()))
+        return list(reversed([_present_run(run) for run in _runs()]))
 
     @app.get("/api/runs/{run_id}")
     def run_detail(run_id: str) -> dict[str, Any]:
         for run in _runs():
             if run["run_id"] == run_id:
-                return run
+                return _present_run(run)
         return {"error": "run_not_found", "run_id": run_id}
 
     @app.get("/api/failures")
@@ -63,6 +63,13 @@ def create_app():
 
 def _runs() -> list[dict[str, Any]]:
     return read_jsonl(default_runs_root() / "runs.jsonl")
+
+
+def _present_run(run: dict[str, Any]) -> dict[str, Any]:
+    item = dict(run)
+    item["agent"] = "scripted" if run.get("agent") == "scripted" else "model"
+    item.pop("model", None)
+    return item
 
 
 def _metrics(runs: list[dict[str, Any]]) -> dict[str, Any]:

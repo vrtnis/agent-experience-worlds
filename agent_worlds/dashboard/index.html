@@ -249,7 +249,7 @@
           <div class="subtle">${run.task_prompt}</div>
           <p><span class="status ${run.passed ? "pass" : "fail"}">${run.passed ? "PASS" : "FAIL"}</span>
           <span class="pill">${run.world}</span>
-          <span class="pill">${run.agent}${run.model ? " / " + run.model : ""}</span>
+          <span class="pill">${run.agent}</span>
           <span class="pill">reward ${fmt.format(run.reward)}</span></p>
           <h2>Tool Timeline</h2>
           <div class="timeline">${calls}</div>
@@ -277,7 +277,7 @@
           <tr data-run-id="${run.run_id}">
             <td><span class="status ${run.passed ? "pass" : "fail"}">${run.passed ? "PASS" : "FAIL"}</span></td>
             <td>${run.world}</td>
-            <td>${run.agent}${run.model ? "<br><span class=\"subtle\">" + run.model + "</span>" : ""}</td>
+            <td>${run.agent}</td>
             <td>${run.task_id}</td>
             <td>${safe(run.failure_type)}</td>
             <td>${fmt.format(run.reward)}</td>
