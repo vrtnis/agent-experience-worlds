@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 authors = [{ name = "Agent Experience Worlds contributors" }]
 
 [project.scripts]
-agent-worlds = "agent_worlds.cli:main"
+agent-exp = "agent_worlds.cli:main"
 
 [project.optional-dependencies]
 api = ["fastapi>=0.110", "uvicorn>=0.27"]

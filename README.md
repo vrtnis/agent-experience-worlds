@@ -29,31 +29,31 @@ python -m pip install -e ".[api,test]"
 ## Run A Task
 
 ```bash
-agent-worlds world reset ledger
-agent-worlds run ledger --task duplicate_payment
+agent-exp world reset ledger
+agent-exp run ledger --task duplicate_payment
 
-agent-worlds world reset contracts
-agent-worlds run contracts --task governing_law
+agent-exp world reset contracts
+agent-exp run contracts --task governing_law
 ```
 
 ## Generate Follow-Up Tasks
 
 ```bash
-agent-worlds curriculum run ledger
-agent-worlds curriculum run contracts
+agent-exp curriculum run ledger
+agent-exp curriculum run contracts
 ```
 
 ## Export Datasets
 
 ```bash
-agent-worlds rl dataset --output-dir data/rl
-agent-worlds rl skyrl-dataset --output-dir data/skyrl
+agent-exp rl dataset --output-dir data/rl
+agent-exp rl skyrl-dataset --output-dir data/skyrl
 ```
 
 ## Start The Dashboard
 
 ```bash
-agent-worlds dashboard start
+agent-exp dashboard start
 ```
 
 Open:

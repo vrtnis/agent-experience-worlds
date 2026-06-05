@@ -14,7 +14,7 @@ from agent_worlds.train.prepare_agent import prepare_skyrl_dataset
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="agent-worlds")
+    parser = argparse.ArgumentParser(prog="agent-exp")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     world_parser = subparsers.add_parser("world", help="World maintenance commands")
