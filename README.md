@@ -77,7 +77,7 @@ data/
 runs/
 ```
 
-## How To Cite
+If you find this work useful, consider citing:
 
 ```bibtex
 @software{agent_experience_worlds,
