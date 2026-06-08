@@ -9,6 +9,7 @@ description = "Verifiable legal and finance environments for agent learning from
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "Agent Experience Worlds contributors" }]
+license = { file = "LICENSE" }
 
 [project.scripts]
 agent-exp = "agent_worlds.cli:main"
